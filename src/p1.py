@@ -6,34 +6,26 @@ from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_m
     f1_score, classification_report
 import numpy as np
 
+from src.p1_functions import *
+
 # Part1
 
 # Read csv
 df = pd.read_csv("../drybeans.csv")
 # print(df)
 
-# Check missing values
+# Check outliers
 
-# print("Count non-null values per row and column")
-# print("df.isnull().all().sum() = " + str(df.isnull().all().sum()))
-# print("Count non-nan values per row and column")
-# print("df.isna().all().sum() = " + str(df.isna().all().sum()))
-# print("Check the values whether contains at least one missing value per row and column and count the number of them")
-# print("df.isnull().any().sum() = " + str(df.isnull().any().sum()))
-# print("Count values which are not null and nan per row and column")
-# print("df.count() = ")
-# print(df.count())
+# df['Area'] = remove_outliers(df, 'Area')
+df = remove_outliers(df)
+# print(df)
+
+# Check missing values
+check_missing_values(df)
 
 # Check and delete duplicated rows
-
-print("Check rows with duplicates on all columns")
-print(df[df.duplicated()])
-print("df length = ", len(df))
-print("Deplicate value_counts = ")
-print(df.duplicated().value_counts())
-# Remove rows with duplicates on all columns
-df = df.drop_duplicates()
-print("df length after removing = ", len(df))
+df = check_and_delete_duplicated_rows(df)
+# print("df length after removing = ", len(df))
 
 x = df.loc[:, 'Area':'ShapeFactor4']
 df.loc[:, 'Class'] = LabelEncoder().fit_transform(df.loc[:, 'Class'])
@@ -44,8 +36,8 @@ y = df.loc[:, 'Class']
 # Standardization
 x_std = StandardScaler().fit_transform(x)
 # Normalization
-# x_std = MinMaxScaler().fit_transform(x)
-print(x_std)
+# x_nor = MinMaxScaler().fit_transform(x)
+# print(x_nor)
 
 # 0.75 for train 0.25 for test and every time random
 x_train, x_test, y_train, y_test = train_test_split(x_std, y, stratify=y)
@@ -59,7 +51,7 @@ model = LogisticRegression(penalty="none", class_weight=None)
 model.fit(x_train, y_train)
 
 pred = model.predict(x_test)
-score = model.score(x_test, y_test)
+# score = model.score(x_test, y_test)
 # print('Accuracy rate = ', score)
 # print('pred = ', pred)
 # print('decision_function = ', model.decision_function(x_test))
