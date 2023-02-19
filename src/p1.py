@@ -1,6 +1,6 @@
 import pandas as pd
 from src.p1_functions import *
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -32,16 +32,13 @@ y = df.loc[:, 'Class']
 # print(x)
 # print(y)
 
-# Standardization
-x_std = StandardScaler().fit_transform(x)
-# Normalization
-# x_nor = MinMaxScaler().fit_transform(x)
-# print(x_nor)
-
 # 0.75 for train 0.25 for test and every time random
-x_train, x_test, y_train, y_test = train_test_split(x_std, y, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y)
 # print(x_train)
 # print(y_train)
+
+# Standardization
+x_train, x_test = standardization(x_train, x_test)
 
 # Part2
 

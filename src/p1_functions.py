@@ -1,5 +1,7 @@
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, precision_score, recall_score, \
     f1_score, classification_report
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
 
 # def remove_outliers(df):
 #     for col in df.columns:
@@ -41,6 +43,28 @@ def check_and_delete_duplicated_rows(df):
     # Remove rows with duplicates on all columns
     return df.drop_duplicates()
     # print("df length after removing = ", len(df))
+
+
+def standardization(x_train, x_test):
+    scaler = StandardScaler()
+    # fit on the training dataset
+    scaler.fit(x_train)
+    # scale the training dataset
+    x_train = scaler.transform(x_train)
+    # scale the test dataset
+    x_test = scaler.transform(x_test)
+    return x_train, x_test
+
+
+# def normalization(x_train, x_test):
+#     scaler = MinMaxScaler()
+#     # fit on the training dataset
+#     scaler.fit(x_train)
+#     # scale the training dataset
+#     x_train = scaler.transform(x_train)
+#     # scale the test dataset
+#     x_test = scaler.transform(x_test)
+#     return x_train, x_test
 
 
 def output_result(y_test, pred):
