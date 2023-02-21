@@ -1,8 +1,9 @@
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, precision_score, recall_score, \
-    f1_score, classification_report
+    classification_report, ConfusionMatrixDisplay
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+import matplotlib.pyplot as plt
 
-
+# Function for remove outliers
 # def remove_outliers(df):
 #     for col in df.columns:
 #         # Exclude categorical variables
@@ -21,6 +22,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 #     return df
 
 
+# Function for checking missing values
 def check_missing_values(df):
     print("Count non-null values per row and column")
     print("df.isnull().all().sum() = " + str(df.isnull().all().sum()))
@@ -34,6 +36,7 @@ def check_missing_values(df):
     print(df.count())
 
 
+# Function for checking and deleting duplicated rows
 def check_and_delete_duplicated_rows(df):
     # print("Check rows with duplicates on all columns")
     # print(df[df.duplicated()])
@@ -45,6 +48,7 @@ def check_and_delete_duplicated_rows(df):
     # print("df length after removing = ", len(df))
 
 
+# Function for scaling (standardization)
 def standardization(x_train, x_test):
     scaler = StandardScaler()
     # fit on the training dataset
@@ -56,6 +60,7 @@ def standardization(x_train, x_test):
     return x_train, x_test
 
 
+# Function for scaling (normalization)
 # def normalization(x_train, x_test):
 #     scaler = MinMaxScaler()
 #     # fit on the training dataset
@@ -67,26 +72,38 @@ def standardization(x_train, x_test):
 #     return x_train, x_test
 
 
+# Function for output solutions
 def output_result(y_test, pred):
-    print('accuracy = ', accuracy_score(y_test, pred.round(), normalize=True))
-    print('classification accuracy = ', accuracy_score(y_test, pred))
-    print('balanced accuracy = ', balanced_accuracy_score(y_test, pred))
-    print('confusion matrix = \n', confusion_matrix(y_test, pred))
-    print('precision = ', precision_score(y_test, pred, average=None))
-    print('precision micro = ', precision_score(y_test, pred, average='micro'))
-    print('precision macro = ', precision_score(y_test, pred, average='macro'))
-    print('recall = ', recall_score(y_test, pred, average=None))
-    print('recall micro = ', recall_score(y_test, pred, average='micro'))
-    print('recall macro = ', recall_score(y_test, pred, average='macro'))
-    print('f1 score = ', f1_score(y_test, pred, average=None))
-    print('classification report = ', classification_report(y_test, pred))
+    # (3-a)
+    # print('classification accuracy = ', accuracy_score(y_test, pred))
+    # (3-b)
+    # print('balanced accuracy = ', balanced_accuracy_score(y_test, pred))
+    # (3-c)
+    # print('confusion matrix = \n', confusion_matrix(y_test, pred))
+    # (3-d)
+    # print('precision micro = ', precision_score(y_test, pred, average='micro'))
+    # print('precision macro = ', precision_score(y_test, pred, average='macro'))
+    # print('recall micro = ', recall_score(y_test, pred, average='micro'))
+    # print('recall macro = ', recall_score(y_test, pred, average='macro'))
+    # print('classification report: \n', classification_report(y_test, pred))
 
+    # (3-a)
     # sum of diagonal elements of confusion matrix / sum of all elements of the confusion matrix
     c = confusion_matrix(y_test, pred)
     accuracy = c.trace() / c.sum()
     # print('classification accuracy = ', accuracy)
 
+    # (3-b)
     # sum of recall_score / size of recall_score
     r = recall_score(y_test, pred, average=None)
     accuracy = r.sum() / r.size
     # print('balanced accuracy = ', accuracy)
+    print("\n")
+
+
+# Function for plot confusion matrix
+def plot_matrix(target_names, y_pred, y_test):
+    cm = confusion_matrix(y_pred, y_test)
+    cmp = ConfusionMatrixDisplay(cm, display_labels=target_names)
+    cmp.plot(cmap=plt.cm.Blues)
+    plt.show()
