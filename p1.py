@@ -1,4 +1,6 @@
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+
 from p1_functions import *
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -40,7 +42,7 @@ df = check_and_delete_duplicated_rows(df)
 x = df.loc[:, 'Area':'ShapeFactor4']
 # Encoding categorical values to numbers.
 # pd = pd.get_dummies(df.loc[:, 'Class'])
-# df.loc[:, 'Class'] = LabelEncoder().fit_transform(df.loc[:, 'Class'])
+df.loc[:, 'Class'] = LabelEncoder().fit_transform(df.loc[:, 'Class'])
 # Check the existence of negative numbers (No need to remove or replace them because there is no such values)
 print("Count negative number = ", str(x.agg(lambda z: sum(z < 0)).sum()))
 y = df.loc[:, 'Class']
@@ -50,24 +52,27 @@ y = df.loc[:, 'Class']
 # 0.75 for train 0.25 for test and every time random
 x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y, random_state=RANDOM_STATE)
 
+# Select features
+x_train, y_train, selected_features, scaler = select_features(x_train, y_train, None, None)
+
 # (1-c, 1-d)
 
 # Standardization
-x_train, x_test = standardization(x_train, x_test)
+# x_train, x_test = standardization(x_train, x_test)
 
 # Part2
 
 # (2-a, 2-b)
 
 # model2a = LogisticRegression(penalty="none", class_weight=None)
-model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=10000, tol=1e-1)
-# evaluate_model(model2a, x_train, y_train, x_test, y_test, target_names)
+model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=1000, tol=1e-1)
+evaluate_model(model2a, x_train, y_train, target_names)
 
 # (2-c)
 
 # model2c = LogisticRegression(penalty="l1", solver="liblinear", class_weight='balanced', max_iter=10000, tol=1e-1)
-model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
-# evaluate_model(model2c, x_train, y_train, x_test, y_test, target_names)
+model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=1000, tol=1e-1)
+evaluate_model(model2c, x_train, y_train, target_names)
 
 # Part3
 
