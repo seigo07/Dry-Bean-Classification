@@ -71,25 +71,34 @@ def check_and_delete_duplicated_rows(df):
         return df.drop_duplicates()
 
 
-def select_features(x, y, select_features, std):
+def select_features(x, y, columns, std):
     # In the case of train
-    if select_features is None:
+    if columns is None:
         # Get select features
-        feature_selection = get_feature_selection(x, y, y.name)
-        select_features = list(feature_selection.columns)
+        x = get_feature_selection(x, y, y.name)
+        columns = list(x.columns)
     # In the case of test
     else:
         # Get select features from stored select_features
-        feature_selection = x[x.columns.intersection(select_features)]
+        x = x[x.columns.intersection(columns)]
     # Standardization
     # In the case of train
     if std is None:
-        std = StandardScaler().fit(feature_selection)
-    # Get the same scaler used for train
-    df = std.transform(feature_selection)
-    df = pd.DataFrame(df, columns=feature_selection.columns)
-    return df, y, select_features, std
+        std = StandardScaler().fit(x)
+    # # Get the same scaler used for train
+    df = std.transform(x)
+    df = pd.DataFrame(df, columns=x.columns)
+    return df, y, columns, std
 
+
+# Function for scaling (standardization)
+def standardization(x):
+    scaler = StandardScaler()
+    # fit on the input dataset
+    scaler.fit(x)
+    # scale the input dataset
+    x = scaler.transform(x)
+    return x
 
 def get_feature_selection(x, y, target_names):
     # Check correlation between features and remove them whose correlation is weak to the output.
@@ -136,18 +145,6 @@ def select_features_based_on_max(df, correlations, target_names):
     return df
 
 
-# Function for scaling (standardization)
-def standardization(x_train, x_test):
-    scaler = StandardScaler()
-    # fit on the training dataset
-    scaler.fit(x_train)
-    # scale the training dataset
-    x_train = scaler.transform(x_train)
-    # scale the test dataset
-    x_test = scaler.transform(x_test)
-    return x_train, x_test
-
-
 # Function for output solutions
 def evaluate_model(model, x, y, target_names):
     pred = model.predict(x)
@@ -183,7 +180,7 @@ def evaluate_model(model, x, y, target_names):
     # print('balanced accuracy by recall_score = ', accuracy)
     print("\n")
 
-    plot_matrix(target_names, pred, y)
+    # plot_matrix(target_names, pred, y)
 
 
 # Function for plot confusion matrix
