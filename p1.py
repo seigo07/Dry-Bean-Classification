@@ -8,10 +8,12 @@ from sklearn.linear_model import LogisticRegression
 
 # (1-a)
 
-csv_file = "drybeans.csv"
+CSV_FILE = "drybeans.csv"
 
 # Read csv
-df = pd.read_csv(csv_file)
+df = pd.read_csv(CSV_FILE)
+
+print(df)
 
 # Store the original Class values for plot
 target_names = df.loc[:, 'Class'].unique()
@@ -51,8 +53,8 @@ x_train, x_test = standardization(x_train, x_test)
 
 # (2-a, 2-b, 2-c)
 
-# model = LogisticRegression(penalty="none", class_weight=None)
-model = LogisticRegression(penalty="none", class_weight=None, max_iter=10000, tol=1e-1)
+model = LogisticRegression(penalty="none", class_weight=None)
+# model = LogisticRegression(penalty="none", class_weight=None, max_iter=10000, tol=1e-1)
 # model = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
 model.fit(x_train, y_train)
 pred = model.predict(x_test)
@@ -65,8 +67,8 @@ pred = model.predict(x_test)
 
 # Part3
 
-output_result(y_test, pred)
-plot_matrix(target_names, pred, y_test)
+# output_result(y_test, pred)
+# plot_matrix(target_names, pred, y_test)
 
 # model2 = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
 # model2.fit(x_train, y_train)

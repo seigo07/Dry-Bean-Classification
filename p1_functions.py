@@ -3,6 +3,7 @@ from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_m
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import matplotlib.pyplot as plt
 
+
 # Function for remove outliers
 # def remove_outliers(df):
 #     for col in df.columns:
@@ -22,8 +23,8 @@ import matplotlib.pyplot as plt
 #     return df
 
 
-# Function for checking missing values
-def check_missing_values(df):
+# Function for checking and deleting missing values
+def check_and_delete_missing_values(df):
     print("Count non-null values per row and column")
     print("df.isnull().all().sum() = " + str(df.isnull().all().sum()))
     print("Count non-nan values per row and column")
@@ -34,18 +35,21 @@ def check_missing_values(df):
     print("Count values which are not null and nan per row and column")
     print("df.count() = ")
     print(df.count())
+    if df.isnull().all().sum() > 0 or df.isna().all().sum() > 0:
+        # Remove rows with null or NaN on all columns
+        return df.dropna()
 
 
 # Function for checking and deleting duplicated rows
 def check_and_delete_duplicated_rows(df):
-    # print("Check rows with duplicates on all columns")
-    # print(df[df.duplicated()])
-    # print("df length = ", len(df))
-    # print("Deplicate value_counts = ")
-    # print(df.duplicated().value_counts())
-    # Remove rows with duplicates on all columns
-    return df.drop_duplicates()
-    # print("df length after removing = ", len(df))
+    print("Check rows with duplicates on all columns")
+    print(df[df.duplicated()])
+    print("df length = ", len(df))
+    print("Deplicate value_counts = ")
+    print(df.duplicated().value_counts())
+    if df.duplicated().value_counts().get(True, 0) > 0:
+        # Remove rows with duplicates on all columns
+        return df.drop_duplicates()
 
 
 # Function for scaling (standardization)
@@ -75,17 +79,17 @@ def standardization(x_train, x_test):
 # Function for output solutions
 def output_result(y_test, pred):
     # (3-a)
-    # print('classification accuracy = ', accuracy_score(y_test, pred))
+    print('classification accuracy = ', accuracy_score(y_test, pred))
     # (3-b)
-    # print('balanced accuracy = ', balanced_accuracy_score(y_test, pred))
+    print('balanced accuracy = ', balanced_accuracy_score(y_test, pred))
     # (3-c)
-    # print('confusion matrix = \n', confusion_matrix(y_test, pred))
+    print('confusion matrix = \n', confusion_matrix(y_test, pred))
     # (3-d)
-    # print('precision micro = ', precision_score(y_test, pred, average='micro'))
-    # print('precision macro = ', precision_score(y_test, pred, average='macro'))
-    # print('recall micro = ', recall_score(y_test, pred, average='micro'))
-    # print('recall macro = ', recall_score(y_test, pred, average='macro'))
-    # print('classification report: \n', classification_report(y_test, pred))
+    print('precision micro = ', precision_score(y_test, pred, average='micro'))
+    print('precision macro = ', precision_score(y_test, pred, average='macro'))
+    print('recall micro = ', recall_score(y_test, pred, average='micro'))
+    print('recall macro = ', recall_score(y_test, pred, average='macro'))
+    print('classification report: \n', classification_report(y_test, pred))
 
     # (3-a)
     # sum of diagonal elements of confusion matrix / sum of all elements of the confusion matrix
