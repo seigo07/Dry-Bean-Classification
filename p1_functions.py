@@ -2,26 +2,35 @@ from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_m
     classification_report, ConfusionMatrixDisplay
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import matplotlib.pyplot as plt
-
+import seaborn as sns
+sns.set()
 
 # Function for remove outliers
-# def remove_outliers(df):
-#     for col in df.columns:
-#         # Exclude categorical variables
-#         if col == "Class":
-#             break
-#         if (df[col].mean() + (df[col].std()) * 3) > df[col].max():
-#             break
-#         # Specify the quantile
-#         # Find the value at 50% of the second quartile of the median
-#         q_50 = df[col].quantile(0.5)
-#         # Get 95% quantile values
-#         q_95 = df[col].quantile(0.95)
-#         # Extract data with values less than 95% order
-#         new_df = df.query(f'{col} < @q_95')
-#         df[col] = new_df[col]
-#     return df
+def remove_outliers(df):
+    for col in df.columns:
+        # Exclude categorical variables
+        if col == "Class":
+            break
+        if (df[col].mean() + (df[col].std()) * 3) > df[col].max():
+            break
+        # Specify the quantile
+        # Find the value at 50% of the second quartile of the median
+        q_50 = df[col].quantile(0.5)
+        # Get 95% quantile values
+        q_95 = df[col].quantile(0.95)
+        # Extract data with values less than 95% order
+        new_df = df.query(f'{col} < @q_95')
+        df[col] = new_df[col]
+    return df
 
+
+# Function for plotting correlation between features
+def plot_correlation(df):
+    corr = df.corr()
+    plt.figure(figsize=(16, 16))
+    sns.heatmap(corr, annot=True, square=True)
+    plt.tight_layout()
+    plt.show()
 
 # Function for checking and deleting missing values
 def check_and_delete_missing_values(df):
@@ -77,7 +86,16 @@ def standardization(x_train, x_test):
 
 
 # Function for output solutions
-def output_result(y_test, pred):
+def evaluate_model(model, x_train, y_train, x_test, y_test, target_names):
+
+    model.fit(x_train, y_train)
+    pred = model.predict(x_test)
+
+    # (2-d)
+    print('pred = ', pred)
+    print('decision_function = ', model.decision_function(x_test))
+    print('predict_proba = ', model.predict_proba(x_test))
+
     # (3-a)
     print('classification accuracy = ', accuracy_score(y_test, pred))
     # (3-b)
@@ -103,6 +121,8 @@ def output_result(y_test, pred):
     accuracy = r.sum() / r.size
     # print('balanced accuracy = ', accuracy)
     print("\n")
+
+    # plot_matrix(target_names, pred, y_test)
 
 
 # Function for plot confusion matrix

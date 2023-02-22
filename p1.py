@@ -1,6 +1,5 @@
 import pandas as pd
 from p1_functions import *
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -13,8 +12,10 @@ RANDOM_STATE = 42
 
 # Read csv
 df = pd.read_csv(CSV_FILE)
+# print(df)
 
-print(df)
+# plot correlation between features
+# plot_correlation(df)
 
 # Store the original Class values for plot
 target_names = df.loc[:, 'Class'].unique()
@@ -53,24 +54,18 @@ x_train, x_test = standardization(x_train, x_test)
 
 # Part2
 
-# (2-a, 2-b, 2-c)
+# (2-a, 2-b)
 
-model = LogisticRegression(penalty="none", class_weight=None)
-# model = LogisticRegression(penalty="none", class_weight=None, max_iter=10000, tol=1e-1)
-# model = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
-model.fit(x_train, y_train)
-pred = model.predict(x_test)
+# model2a = LogisticRegression(penalty="none", class_weight=None)
+model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=10000, tol=1e-1)
+# evaluate_model(model2a, x_train, y_train, x_test, y_test, target_names)
 
-# (2-d)
+# (2-c)
 
-# print('pred = ', pred)
-# print('decision_function = ', model.decision_function(x_test))
-# print('predict_proba = ', model.predict_proba(x_test))
+model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
+evaluate_model(model2c, x_train, y_train, x_test, y_test, target_names)
 
 # Part3
-
-output_result(y_test, pred)
-# plot_matrix(target_names, pred, y_test)
 
 # model2 = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
 # model2.fit(x_train, y_train)
