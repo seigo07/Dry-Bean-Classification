@@ -1,10 +1,11 @@
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, precision_score, recall_score, \
-    classification_report, ConfusionMatrixDisplay, precision_recall_curve
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 sns.set()
-import pandas as pd
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, precision_score, recall_score, \
+    classification_report, ConfusionMatrixDisplay
+from sklearn.preprocessing import StandardScaler
 
 # This file includes codes which were used in the process and comment out
 # or not used in the end to show the process for this assignment.
@@ -147,18 +148,6 @@ def standardization(x_train, x_test):
     return x_train, x_test
 
 
-# Function for scaling (normalization)
-# def normalization(x_train, x_test):
-#     scaler = MinMaxScaler()
-#     # fit on the training dataset
-#     scaler.fit(x_train)
-#     # scale the training dataset
-#     x_train = scaler.transform(x_train)
-#     # scale the test dataset
-#     x_test = scaler.transform(x_test)
-#     return x_train, x_test
-
-
 # Function for output solutions
 def evaluate_model(model, x, y, target_names):
     pred = model.predict(x)
@@ -203,4 +192,3 @@ def plot_matrix(target_names, y_pred, y_test):
     cmp = ConfusionMatrixDisplay(cm, display_labels=target_names)
     cmp.plot(cmap=plt.cm.Blues)
     plt.show()
-
