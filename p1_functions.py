@@ -1,9 +1,8 @@
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, precision_score, recall_score, \
-    classification_report, ConfusionMatrixDisplay
+    classification_report, ConfusionMatrixDisplay, precision_recall_curve
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 sns.set()
 import pandas as pd
 
@@ -71,77 +70,6 @@ def check_and_delete_duplicated_rows(df):
         return df.drop_duplicates()
 
 
-# Function for scaling (standardization)
-def standardization(x_train, x_test):
-    scaler = StandardScaler()
-    # fit on the training dataset
-    scaler.fit(x_train)
-    # scale the training dataset
-    x_train = scaler.transform(x_train)
-    # scale the test dataset
-    x_test = scaler.transform(x_test)
-    return x_train, x_test
-
-
-# Function for scaling (normalization)
-# def normalization(x_train, x_test):
-#     scaler = MinMaxScaler()
-#     # fit on the training dataset
-#     scaler.fit(x_train)
-#     # scale the training dataset
-#     x_train = scaler.transform(x_train)
-#     # scale the test dataset
-#     x_test = scaler.transform(x_test)
-#     return x_train, x_test
-
-
-# Function for output solutions
-def evaluate_model(model, x, y, target_names):
-    model.fit(x, y)
-    pred = model.predict(x)
-
-    # (2-d)
-    print('pred = ', pred)
-    print('decision_function = ', model.decision_function(x))
-    print('predict_proba = ', model.predict_proba(x))
-
-    # (3-a)
-    print('classification accuracy = ', accuracy_score(y, pred))
-    # (3-b)
-    print('balanced accuracy = ', balanced_accuracy_score(y, pred))
-    # (3-c)
-    print('confusion matrix = \n', confusion_matrix(y, pred))
-    # (3-d)
-    print('precision micro = ', precision_score(y, pred, average='micro'))
-    print('precision macro = ', precision_score(y, pred, average='macro'))
-    print('recall micro = ', recall_score(y, pred, average='micro'))
-    print('recall macro = ', recall_score(y, pred, average='macro'))
-    print('classification report: \n', classification_report(y, pred))
-
-    # (3-a)
-    # sum of diagonal elements of confusion matrix / sum of all elements of the confusion matrix
-    c = confusion_matrix(y, pred)
-    accuracy = c.trace() / c.sum()
-    # print('classification accuracy = ', accuracy)
-
-    # (3-b)
-    # sum of recall_score / size of recall_score
-    r = recall_score(y, pred, average=None)
-    accuracy = r.sum() / r.size
-    # print('balanced accuracy = ', accuracy)
-    print("\n")
-
-    # plot_matrix(target_names, pred, y_test)
-
-
-# Function for plot confusion matrix
-def plot_matrix(target_names, y_pred, y_test):
-    cm = confusion_matrix(y_pred, y_test)
-    cmp = ConfusionMatrixDisplay(cm, display_labels=target_names)
-    cmp.plot(cmap=plt.cm.Blues)
-    plt.show()
-
-
 def select_features(x, y, select_features, std):
     # In the case of train
     if select_features is None:
@@ -205,3 +133,74 @@ def select_features_based_on_max(df, correlations, target_names):
                         df.drop(feature_col_1, axis=1, inplace=True)
                     break
     return df
+
+
+# Function for scaling (standardization)
+def standardization(x_train, x_test):
+    scaler = StandardScaler()
+    # fit on the training dataset
+    scaler.fit(x_train)
+    # scale the training dataset
+    x_train = scaler.transform(x_train)
+    # scale the test dataset
+    x_test = scaler.transform(x_test)
+    return x_train, x_test
+
+
+# Function for scaling (normalization)
+# def normalization(x_train, x_test):
+#     scaler = MinMaxScaler()
+#     # fit on the training dataset
+#     scaler.fit(x_train)
+#     # scale the training dataset
+#     x_train = scaler.transform(x_train)
+#     # scale the test dataset
+#     x_test = scaler.transform(x_test)
+#     return x_train, x_test
+
+
+# Function for output solutions
+def evaluate_model(model, x, y, target_names):
+    pred = model.predict(x)
+
+    # (2-d)
+    print('pred = ', pred)
+    print('decision_function = ', model.decision_function(x))
+    print('predict_proba = ', model.predict_proba(x))
+
+    # (3-a)
+    print('classification accuracy = ', accuracy_score(y, pred))
+    # (3-b)
+    print('balanced accuracy = ', balanced_accuracy_score(y, pred))
+    # (3-c)
+    print('confusion matrix = \n', confusion_matrix(y, pred))
+    # (3-d)
+    print('precision micro = ', precision_score(y, pred, average='micro'))
+    print('precision macro = ', precision_score(y, pred, average='macro'))
+    print('recall micro = ', recall_score(y, pred, average='micro'))
+    print('recall macro = ', recall_score(y, pred, average='macro'))
+    print('classification report: \n', classification_report(y, pred))
+
+    # (3-a)
+    # sum of diagonal elements of confusion matrix / sum of all elements of the confusion matrix
+    c = confusion_matrix(y, pred)
+    accuracy = c.trace() / c.sum()
+    # print('classification accuracy by confusion_matrix = ', accuracy)
+
+    # (3-b)
+    # sum of recall_score / size of recall_score
+    r = recall_score(y, pred, average=None)
+    accuracy = r.sum() / r.size
+    # print('balanced accuracy by recall_score = ', accuracy)
+    print("\n")
+
+    plot_matrix(target_names, pred, y)
+
+
+# Function for plot confusion matrix
+def plot_matrix(target_names, y_pred, y_test):
+    cm = confusion_matrix(y_pred, y_test)
+    cmp = ConfusionMatrixDisplay(cm, display_labels=target_names)
+    cmp.plot(cmap=plt.cm.Blues)
+    plt.show()
+

@@ -8,7 +8,7 @@ from sklearn.linear_model import LogisticRegression
 # This file includes codes which were used in the process and comment out
 # or not used in the end to show the process for this assignment.
 
-# Part1
+# Part1: Data Processing
 
 # (1-a)
 
@@ -41,49 +41,51 @@ df = check_and_delete_duplicated_rows(df)
 # Splitting data into x and y
 x = df.loc[:, 'Area':'ShapeFactor4']
 # Encoding categorical values to numbers.
-# pd = pd.get_dummies(df.loc[:, 'Class'])
 df.loc[:, 'Class'] = LabelEncoder().fit_transform(df.loc[:, 'Class'])
 # Check the existence of negative numbers (No need to remove or replace them because there is no such values)
 print("Count negative number = ", str(x.agg(lambda z: sum(z < 0)).sum()))
 y = df.loc[:, 'Class']
-
+#
 # (1-b)
 
 # 0.75 for train 0.25 for test and every time random
 x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y, random_state=RANDOM_STATE)
 
 # Select features
-x_train, y_train, selected_features, scaler = select_features(x_train, y_train, None, None)
+x_train, y_train, selected_features, std = select_features(x_train, y_train, None, None)
+# print("hoge1:",selected_features)
 
 # (1-c, 1-d)
 
 # Standardization
 # x_train, x_test = standardization(x_train, x_test)
 
-# Part2
+# Part2: Training
 
 # (2-a, 2-b)
 
-# model2a = LogisticRegression(penalty="none", class_weight=None)
 model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=1000, tol=1e-1)
-evaluate_model(model2a, x_train, y_train, target_names)
+model2a.fit(x_train, y_train)
+# evaluate_model(model2a, x_train, y_train, target_names)
 
 # (2-c)
 
-# model2c = LogisticRegression(penalty="l1", solver="liblinear", class_weight='balanced', max_iter=10000, tol=1e-1)
 model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=1000, tol=1e-1)
-evaluate_model(model2c, x_train, y_train, target_names)
+model2c.fit(x_train, y_train)
+# evaluate_model(model2c, x_train, y_train, target_names)
 
-# Part3
+# Part3: Evaluation
 
-# model2 = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
-# model2.fit(x_train, y_train)
-# pred2 = model2.predict(x_test)
-# output_result(y_test, pred2)
-# plot_matrix(target_names, pred2, y_test)
+# (3-a, 3-b, 3-c)
+
+x_test, y_test, selected_features, scaler = select_features(x_test, y_test, selected_features, std)
+evaluate_model(model2a, x_test, y_test, target_names)
+evaluate_model(model2c, x_test, y_test, target_names)
+
+# Part4: Advanced Tasks
 
 # Part4-a
-# model3 = LogisticRegression(penalty="l2", class_weight='balanced', max_iter=10000, tol=1e-1)
+# model3 = LogisticRegression(penalty="l2", class_weight='balanced', max_iter=1000, tol=1e-1)
 # model3.fit(x_train, y_train)
 # pred2 = model3.predict(x_test)
 # output_result(y_test, pred2)
