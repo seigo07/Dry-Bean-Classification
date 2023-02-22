@@ -82,23 +82,19 @@ def select_features(x, y, columns, std):
         # Get select features from stored select_features
         x = x[x.columns.intersection(columns)]
     # Standardization
-    # In the case of train
-    if std is None:
-        std = StandardScaler().fit(x)
-    # # Get the same scaler used for train
-    df = std.transform(x)
+    df, std = standardization(x, std)
     df = pd.DataFrame(df, columns=x.columns)
     return df, y, columns, std
 
 
 # Function for scaling (standardization)
-def standardization(x):
-    scaler = StandardScaler()
-    # fit on the input dataset
-    scaler.fit(x)
+def standardization(x, std):
+    # In the case of train
+    if std is None:
+        std = StandardScaler().fit(x)
     # scale the input dataset
-    x = scaler.transform(x)
-    return x
+    df = std.transform(x)
+    return df, std
 
 def get_feature_selection(x, y, target_names):
     # Check correlation between features and remove them whose correlation is weak to the output.
