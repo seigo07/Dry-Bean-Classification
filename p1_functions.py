@@ -83,7 +83,6 @@ def select_features(x, y, columns, std):
         x = x[x.columns.intersection(columns)]
     # Standardization
     df, std = standardization(x, std)
-    df = pd.DataFrame(df, columns=x.columns)
     return df, y, columns, std
 
 
@@ -93,7 +92,7 @@ def standardization(x, std):
     if std is None:
         std = StandardScaler().fit(x)
     # scale the input dataset
-    df = std.transform(x)
+    df = pd.DataFrame(std.transform(x), columns=x.columns)
     return df, std
 
 def get_feature_selection(x, y, target_names):
