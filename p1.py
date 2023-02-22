@@ -1,6 +1,6 @@
 import pandas as pd
 from p1_functions import *
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -9,6 +9,7 @@ from sklearn.linear_model import LogisticRegression
 # (1-a)
 
 CSV_FILE = "drybeans.csv"
+RANDOM_STATE = 42
 
 # Read csv
 df = pd.read_csv(CSV_FILE)
@@ -34,15 +35,16 @@ df = check_and_delete_duplicated_rows(df)
 # Splitting data into x and y
 x = df.loc[:, 'Area':'ShapeFactor4']
 # Encoding categorical values to numbers.
-df.loc[:, 'Class'] = LabelEncoder().fit_transform(df.loc[:, 'Class'])
+# pd = pd.get_dummies(df.loc[:, 'Class'])
+# df.loc[:, 'Class'] = LabelEncoder().fit_transform(df.loc[:, 'Class'])
 # Check the existence of negative numbers (No need to remove or replace them because there is no such values)
-print("Count negative number = ", str(df.agg(lambda x: sum(x < 0)).sum()))
+print("Count negative number = ", str(x.agg(lambda z: sum(z < 0)).sum()))
 y = df.loc[:, 'Class']
 
 # (1-b)
 
 # 0.75 for train 0.25 for test and every time random
-x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y, random_state=RANDOM_STATE)
 
 # (1-c, 1-d)
 
@@ -67,7 +69,7 @@ pred = model.predict(x_test)
 
 # Part3
 
-# output_result(y_test, pred)
+output_result(y_test, pred)
 # plot_matrix(target_names, pred, y_test)
 
 # model2 = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
