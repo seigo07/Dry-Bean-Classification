@@ -3,6 +3,9 @@ from p1_functions import *
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
+# This file includes codes which were used in the process and comment out
+# or not used in the end to show the process for this assignment.
+
 # Part1
 
 # (1-a)
@@ -62,8 +65,9 @@ model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=10000, 
 
 # (2-c)
 
+# model2c = LogisticRegression(penalty="l1", solver="liblinear", class_weight='balanced', max_iter=10000, tol=1e-1)
 model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=10000, tol=1e-1)
-evaluate_model(model2c, x_train, y_train, x_test, y_test, target_names)
+# evaluate_model(model2c, x_train, y_train, x_test, y_test, target_names)
 
 # Part3
 

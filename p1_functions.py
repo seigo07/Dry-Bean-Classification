@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
 
+# This file includes codes which were used in the process and comment out
+# or not used in the end to show the process for this assignment.
+
 # Function for remove outliers
 def remove_outliers(df):
     for col in df.columns:
