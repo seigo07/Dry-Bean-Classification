@@ -84,11 +84,12 @@ x_select_test, y_select_test, columns, std = feature_selection(x_test, y_test, c
 # Part4: Advanced Tasks
 
 # (4-a)
-model4a = LogisticRegression(penalty="l2", class_weight='balanced', max_iter=1000, tol=1e-1)
-model4a.fit(x_select_train, y_select_train)
-# evaluate_model(model2c, x_select_test, y_select_test, target_names)
+# Prepare regularised and unregularised models for (4-c)
+model4a = LogisticRegression(penalty="l2", class_weight=None, max_iter=1000, tol=1e-1)
+model4c = LogisticRegression(penalty='none', class_weight=None, max_iter=1000, tol=1e-1)
 
 # (4-b)
+# Apply 2nd degree polynomial expansion
 pf = PolynomialFeatures(degree=2, interaction_only=True)
 x_train_pf = pd.DataFrame(pf.fit_transform(x_train))
 x_test_pf = pd.DataFrame(pf.transform(x_test))
@@ -99,3 +100,10 @@ print("The number of features after applying a 2nd degree polynomial expansion =
 # Standardization for evaluation
 x_train_pf, std_pf = standardization(x_train_pf, None)
 x_test_pf, std_pf = standardization(x_test_pf, std_pf)
+
+# (4-c)
+# Evalulate regularised and unregularised expansion models
+model4a.fit(x_train_pf, y_train)
+model4c.fit(x_train_pf, y_train)
+evaluate_model(model4a, x_test_pf, y_test, target_names)
+evaluate_model(model4c, x_test_pf, y_test, target_names)
