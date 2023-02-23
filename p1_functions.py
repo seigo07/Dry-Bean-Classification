@@ -194,3 +194,5 @@ def plot_matrix(target_names, y_pred, y_test):
     cmp = ConfusionMatrixDisplay(cm, display_labels=target_names)
     cmp.plot(cmap=plt.cm.Blues)
     plt.show()
+
+

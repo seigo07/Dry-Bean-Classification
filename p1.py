@@ -88,19 +88,14 @@ model4a = LogisticRegression(penalty="l2", class_weight='balanced', max_iter=100
 model4a.fit(x_select_train, y_select_train)
 # evaluate_model(model2c, x_select_test, y_select_test, target_names)
 
-# # (4-b)
-# # 4.b. Implement a 2nd degree polynomial expansion on the training data set.
-# # This does not include the interactions of features with themselves.
-# pf = PolynomialFeatures(degree=2, interaction_only=True)
-#
-# # Apply the polynomial expansion to the training and testing data sets.
-# crxL2TrainingSetInputExpanded = pd.DataFrame(pf.fit_transform(crxOriginalTrainingInput))
-# crxL2TestingSetInputExpanded = pd.DataFrame(pf.transform(crxOriginalTestingInput))
-#
-# # Show results of the expansion.
-# print("No: of Features Before 2nd Degree Polynomial Expansion: " + str(len(crxOriginalTrainingInput.columns)))
-# print("No: of Features After 2nd Degree Polynomial Expansion: " + str(len(crxL2TrainingSetInputExpanded.columns)) + "\n")
-#
-# # Process the training and testing data the same as for previous parts, but do not use feature selection (L2 penalty will do it).
-# crxL2TrainingSetInputExpanded, crxL2TrainingSetOutput, l2Scaler = processDataAdv(crxL2TrainingSetInputExpanded, crxOriginalTrainingOutput, None)
-# crxL2TestingSetInputExpanded, crxL2TestingSetOutput, l2Scaler = processDataAdv(crxL2TestingSetInputExpanded, crxOriginalTestingOutput, l2Scaler)
+# (4-b)
+pf = PolynomialFeatures(degree=2, interaction_only=True)
+x_train_pf = pd.DataFrame(pf.fit_transform(x_train))
+x_test_pf = pd.DataFrame(pf.transform(x_test))
+
+print("The number of features before applying a 2nd degree polynomial expansion = " + str(len(x_train.columns)))
+print("The number of features after applying a 2nd degree polynomial expansion = " + str(len(x_train_pf.columns)) + "\n")
+
+# Standardization for evaluation
+x_train_pf, std_pf = standardization(x_train_pf, None)
+x_test_pf, std_pf = standardization(x_test_pf, std_pf)
