@@ -71,19 +71,25 @@ def check_and_delete_duplicated_rows(df):
         return df.drop_duplicates()
 
 
-def select_features(x, y, columns, std):
+# Function for feature selection
+def feature_selection(x, y, columns, std):
+    selected_features, columns = select_features(x, y, columns)
+    df, std = standardization(selected_features, std)
+    return df, y, columns, std
+
+
+# Function for select features
+def select_features(x, y, columns):
     # In the case of train
     if columns is None:
         # Get select features
-        x = get_feature_selection(x, y, y.name)
-        columns = list(x.columns)
+        selected_features = get_feature_selection(x, y, y.name)
+        columns = list(selected_features.columns)
     # In the case of test
     else:
         # Get select features from stored select_features
-        x = x[x.columns.intersection(columns)]
-    # Standardization
-    df, std = standardization(x, std)
-    return df, y, columns, std
+        selected_features = x[x.columns.intersection(columns)]
+    return selected_features, columns
 
 
 # Function for scaling (standardization)
