@@ -111,6 +111,7 @@ def get_features(x, y, target_names):
     return df
 
 
+# Function for select features based on CORRELATION_MIN
 def select_features_based_on_min(x, y):
     # Calculate the correlation plot of the data set.
     df = pd.concat([x, y], axis=1)
@@ -125,6 +126,7 @@ def select_features_based_on_min(x, y):
     return correlations, df
 
 
+# Function for select features based on CORRELATION_MAX
 def select_features_based_on_max(df, correlations, target_names):
     # Remove linearly dependant features.
     feature_corr = abs(df.corr())
@@ -183,7 +185,7 @@ def evaluate_model(model, x, y, target_names):
     # print('balanced accuracy by recall_score = ', accuracy)
     print("\n")
 
-    # plot_matrix(target_names, pred, y)
+    plot_matrix(target_names, pred, y)
 
 
 # Function for plot confusion matrix

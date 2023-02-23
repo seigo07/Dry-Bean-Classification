@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, PolynomialFeatures
 
 from p1_functions import *
 from sklearn.model_selection import train_test_split
@@ -52,7 +52,7 @@ y = df.loc[:, 'Class']
 x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y, random_state=RANDOM_STATE)
 
 # Select features
-x_train, y_train, columns, std = feature_selection(x_train, y_train, None, None)
+x_select_train, y_select_train, columns, std = feature_selection(x_train, y_train, None, None)
 
 # (1-c, 1-d)
 
@@ -64,27 +64,43 @@ x_train, y_train, columns, std = feature_selection(x_train, y_train, None, None)
 # (2-a, 2-b)
 
 model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=1000, tol=1e-1)
-model2a.fit(x_train, y_train)
-# evaluate_model(model2a, x_train, y_train, target_names)
+model2a.fit(x_select_train, y_select_train)
+# evaluate_model(model2a, x_select_train, y_select_train, target_names)
 
 # (2-c)
 
 model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=1000, tol=1e-1)
-model2c.fit(x_train, y_train)
-# evaluate_model(model2c, x_train, y_train, target_names)
+model2c.fit(x_select_train, y_select_train)
+# evaluate_model(model2c, x_select_train, y_select_train, target_names)
 
 # Part3: Evaluation
 
 # (3-a, 3-b, 3-c)
 
-x_test, y_test, columns, std = feature_selection(x_test, y_test, columns, std)
-evaluate_model(model2a, x_test, y_test, target_names)
-evaluate_model(model2c, x_test, y_test, target_names)
+x_select_test, y_select_test, columns, std = feature_selection(x_test, y_test, columns, std)
+# evaluate_model(model2a, x_select_test, y_select_test, target_names)
+# evaluate_model(model2c, x_select_test, y_select_test, target_names)
 
 # Part4: Advanced Tasks
 
-# Part4-a
-# model3 = LogisticRegression(penalty="l2", class_weight='balanced', max_iter=1000, tol=1e-1)
-# model3.fit(x_train, y_train)
-# pred2 = model3.predict(x_test)
-# output_result(y_test, pred2)
+# (4-a)
+model4a = LogisticRegression(penalty="l2", class_weight='balanced', max_iter=1000, tol=1e-1)
+model4a.fit(x_select_train, y_select_train)
+# evaluate_model(model2c, x_select_test, y_select_test, target_names)
+
+# # (4-b)
+# # 4.b. Implement a 2nd degree polynomial expansion on the training data set.
+# # This does not include the interactions of features with themselves.
+# pf = PolynomialFeatures(degree=2, interaction_only=True)
+#
+# # Apply the polynomial expansion to the training and testing data sets.
+# crxL2TrainingSetInputExpanded = pd.DataFrame(pf.fit_transform(crxOriginalTrainingInput))
+# crxL2TestingSetInputExpanded = pd.DataFrame(pf.transform(crxOriginalTestingInput))
+#
+# # Show results of the expansion.
+# print("No: of Features Before 2nd Degree Polynomial Expansion: " + str(len(crxOriginalTrainingInput.columns)))
+# print("No: of Features After 2nd Degree Polynomial Expansion: " + str(len(crxL2TrainingSetInputExpanded.columns)) + "\n")
+#
+# # Process the training and testing data the same as for previous parts, but do not use feature selection (L2 penalty will do it).
+# crxL2TrainingSetInputExpanded, crxL2TrainingSetOutput, l2Scaler = processDataAdv(crxL2TrainingSetInputExpanded, crxOriginalTrainingOutput, None)
+# crxL2TestingSetInputExpanded, crxL2TestingSetOutput, l2Scaler = processDataAdv(crxL2TestingSetInputExpanded, crxOriginalTestingOutput, l2Scaler)
