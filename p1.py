@@ -47,7 +47,7 @@ y = df.loc[:, 'Class']
 x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y, random_state=RANDOM_STATE)
 
 # Select features
-x_select_train, y_select_train, columns, std = feature_selection(x_train, y_train, None, None)
+x_train, y_train, columns, std = feature_selection(x_train, y_train, None, None)
 
 # (1-c, 1-d)
 
@@ -56,22 +56,22 @@ x_select_train, y_select_train, columns, std = feature_selection(x_train, y_trai
 # (2-a, 2-b)
 
 model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
-model2a.fit(x_select_train, y_select_train)
-# evaluate_model(model2a, x_select_train, y_select_train, target_names)
+model2a.fit(x_train, y_train)
+# evaluate_model(model2a, x_train, y_train, target_names)
 
 # (2-c)
 
 model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
-model2c.fit(x_select_train, y_select_train)
-# evaluate_model(model2c, x_select_train, y_select_train, target_names)
+model2c.fit(x_train, y_train)
+# evaluate_model(model2c, x_train, y_train, target_names)
 
 # Part3: Evaluation
 
 # (3-a, 3-b, 3-c)
 
-x_select_test, y_select_test, columns, std = feature_selection(x_test, y_test, columns, std)
-evaluate_model(model2a, x_select_test, y_select_test, target_names)
-evaluate_model(model2c, x_select_test, y_select_test, target_names)
+x_test, y_test, columns, std = feature_selection(x_test, y_test, columns, std)
+# evaluate_model(model2a, x_test, y_test, target_names)
+# evaluate_model(model2c, x_test, y_test, target_names)
 
 # Part4: Advanced Tasks
 
