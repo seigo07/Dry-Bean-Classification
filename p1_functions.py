@@ -83,7 +83,7 @@ def select_features(x, y, columns):
     # In the case of train
     if columns is None:
         # Get select features
-        selected_features = get_feature_selection(x, y, y.name)
+        selected_features = get_features(x, y, y.name)
         columns = list(selected_features.columns)
     # In the case of test
     else:
@@ -101,7 +101,9 @@ def standardization(x, std):
     df = pd.DataFrame(std.transform(x), columns=x.columns)
     return df, std
 
-def get_feature_selection(x, y, target_names):
+
+# Function for get possible features
+def get_features(x, y, target_names):
     # Check correlation between features and remove them whose correlation is weak to the output.
     correlations, df = select_features_based_on_min(x, y)
     # Check correlation between features and remove them whose correlation is strong for linear independence.
