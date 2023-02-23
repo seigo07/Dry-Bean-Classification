@@ -14,7 +14,7 @@ CORRELATION_MIN = 0.3
 CORRELATION_MAX = 0.9
 
 
-# Function for remove outliers
+# Function for remove outliers (unused)
 def remove_outliers(df):
     for col in df.columns:
         # Exclude categorical variables
@@ -31,15 +31,6 @@ def remove_outliers(df):
         new_df = df.query(f'{col} < @q_95')
         df[col] = new_df[col]
     return df
-
-
-# Function for plotting correlation between features
-def plot_correlation(df):
-    corr = df.corr()
-    plt.figure(figsize=(16, 16))
-    sns.heatmap(corr, annot=True, square=True)
-    plt.tight_layout()
-    plt.show()
 
 
 # Function for checking and deleting missing values

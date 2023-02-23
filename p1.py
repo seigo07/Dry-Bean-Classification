@@ -1,9 +1,8 @@
-import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, PolynomialFeatures
 
 from p1_functions import *
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
 
 # This file includes codes which were used in the process and comment out
 # or not used in the end to show the process for this assignment.
@@ -14,21 +13,17 @@ from sklearn.linear_model import LogisticRegression
 
 CSV_FILE = "drybeans.csv"
 RANDOM_STATE = 42
+THE_LIMITED_NUMBER_OF_EPOCHS = 1000
+STOP_TIMES = 1e-1
 
 # Read csv
 df = pd.read_csv(CSV_FILE)
-# print(df)
-
-# plot correlation between features
-# plot_correlation(df)
 
 # Store the original Class values for plot
 target_names = df.loc[:, 'Class'].unique()
 
-# Check outliers
-# df['Area'] = remove_outliers(df, 'Area')
+# Check and remove outliers
 # df = remove_outliers(df)
-# print(df)
 
 # Check missing values
 # check_missing_values(df)
@@ -56,20 +51,17 @@ x_select_train, y_select_train, columns, std = feature_selection(x_train, y_trai
 
 # (1-c, 1-d)
 
-# Standardization
-# x_train, x_test = standardization(x_train, x_test)
-
 # Part2: Training
 
 # (2-a, 2-b)
 
-model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=1000, tol=1e-1)
+model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
 model2a.fit(x_select_train, y_select_train)
 # evaluate_model(model2a, x_select_train, y_select_train, target_names)
 
 # (2-c)
 
-model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=1000, tol=1e-1)
+model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
 model2c.fit(x_select_train, y_select_train)
 # evaluate_model(model2c, x_select_train, y_select_train, target_names)
 
@@ -78,15 +70,15 @@ model2c.fit(x_select_train, y_select_train)
 # (3-a, 3-b, 3-c)
 
 x_select_test, y_select_test, columns, std = feature_selection(x_test, y_test, columns, std)
-# evaluate_model(model2a, x_select_test, y_select_test, target_names)
-# evaluate_model(model2c, x_select_test, y_select_test, target_names)
+evaluate_model(model2a, x_select_test, y_select_test, target_names)
+evaluate_model(model2c, x_select_test, y_select_test, target_names)
 
 # Part4: Advanced Tasks
 
 # (4-a)
 # Prepare regularised and unregularised models for (4-c)
-model4a = LogisticRegression(penalty="l2", class_weight=None, max_iter=1000, tol=1e-1)
-model4c = LogisticRegression(penalty='none', class_weight=None, max_iter=1000, tol=1e-1)
+model4a = LogisticRegression(penalty="l2", class_weight=None, max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
+model4c = LogisticRegression(penalty='none', class_weight=None, max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
 
 # (4-b)
 # Apply 2nd degree polynomial expansion
@@ -103,7 +95,7 @@ x_test_pf, std_pf = standardization(x_test_pf, std_pf)
 
 # (4-c)
 # Evalulate regularised and unregularised expansion models
-model4a.fit(x_train_pf, y_train)
-model4c.fit(x_train_pf, y_train)
-evaluate_model(model4a, x_test_pf, y_test, target_names)
-evaluate_model(model4c, x_test_pf, y_test, target_names)
+# model4a.fit(x_train_pf, y_train)
+# model4c.fit(x_train_pf, y_train)
+# evaluate_model(model4a, x_test_pf, y_test, target_names)
+# evaluate_model(model4c, x_test_pf, y_test, target_names)
