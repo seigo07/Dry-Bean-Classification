@@ -1,8 +1,11 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import LabelEncoder, PolynomialFeatures
-
+from sklearn.svm import LinearSVC
 from p1_functions import *
+from sklearn.preprocessing import label_binarize
+from sklearn.multiclass import OneVsRestClassifier
 
 # This file includes codes which were used in the process and comment out
 # or not used in the end to show the process for this assignment.
@@ -61,7 +64,8 @@ evaluate_model(model2a, x_train, y_train, target_names)
 
 # (2-c)
 
-model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
+model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=THE_LIMITED_NUMBER_OF_EPOCHS,
+                             tol=STOP_TIMES)
 model2c.fit(x_train, y_train)
 evaluate_model(model2c, x_train, y_train, target_names)
 
@@ -87,7 +91,8 @@ x_train_pf = pd.DataFrame(pf.fit_transform(x_train))
 x_test_pf = pd.DataFrame(pf.transform(x_test))
 
 print("The number of features before applying a 2nd degree polynomial expansion = " + str(len(x_train.columns)))
-print("The number of features after applying a 2nd degree polynomial expansion = " + str(len(x_train_pf.columns)) + "\n")
+print(
+    "The number of features after applying a 2nd degree polynomial expansion = " + str(len(x_train_pf.columns)) + "\n")
 
 # Standardization for evaluation
 x_train_pf, std_pf = standardization(x_train_pf, None)
@@ -101,3 +106,22 @@ evaluate_model(model4a, x_test_pf, y_test, target_names)
 evaluate_model(model4c, x_test_pf, y_test, target_names)
 
 # (4-d)
+
+# Apply label_binarize to original output datasets to be multi-label
+y_4d = label_binarize(df.loc[:, 'Class'], classes=df.loc[:, 'Class'].unique())
+n_classes = y_4d.shape[1]
+
+# Split original datasets into training and test
+x_train_4d, x_test_4d, y_train_4d, y_test_4d = train_test_split(x, y_4d, random_state=RANDOM_STATE)
+
+classifier = OneVsRestClassifier(
+    make_pipeline(StandardScaler(), LinearSVC(max_iter=10000, tol=STOP_TIMES, random_state=RANDOM_STATE))
+)
+classifier.fit(x_train_4d, y_train_4d)
+y_score = classifier.decision_function(x_test_4d)
+
+# Define precision, recall, and average_precision
+precision, recall, average_precision = setup_precision_recall_average_precision(n_classes, y_test_4d, y_score)
+
+# Plot details
+plot_precision_recall(precision, recall, average_precision, n_classes, target_names)

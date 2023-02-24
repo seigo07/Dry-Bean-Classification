@@ -1,10 +1,14 @@
+from itertools import cycle
+
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 sns.set()
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, precision_score, recall_score, \
-    classification_report, ConfusionMatrixDisplay
+    classification_report, ConfusionMatrixDisplay, precision_recall_curve, average_precision_score, \
+    PrecisionRecallDisplay
 from sklearn.preprocessing import StandardScaler
 
 # This file includes codes which were used in the process and comment out
@@ -187,3 +191,61 @@ def plot_matrix(target_names, y_pred, y_test):
     plt.show()
 
 
+# Function for each class
+def setup_precision_recall_average_precision(n_classes, y_test, y_score):
+    precision = dict()
+    recall = dict()
+    average_precision = dict()
+    for i in range(n_classes):
+        precision[i], recall[i], _ = precision_recall_curve(y_test[:, i], y_score[:, i])
+        average_precision[i] = average_precision_score(y_test[:, i], y_score[:, i])
+
+    # A "micro-average": quantifying score on all classes jointly
+    precision["micro"], recall["micro"], _ = precision_recall_curve(
+        y_test.ravel(), y_score.ravel()
+    )
+    average_precision["micro"] = average_precision_score(y_test, y_score, average="micro")
+    return precision, recall, average_precision
+
+
+# Function for plot Precision-Recall
+def plot_precision_recall(precision, recall, average_precision, n_classes, target_names):
+    colors = cycle(["navy", "turquoise", "darkorange", "cornflowerblue", "teal"])
+
+    _, ax = plt.subplots(figsize=(7, 8))
+
+    f_scores = np.linspace(0.2, 0.8, num=4)
+    lines, labels = [], []
+    for f_score in f_scores:
+        x = np.linspace(0.01, 1)
+        y = f_score * x / (2 * x - f_score)
+        (l,) = plt.plot(x[y >= 0], y[y >= 0], color="gray", alpha=0.2)
+        plt.annotate("f1={0:0.1f}".format(f_score), xy=(0.9, y[45] + 0.02))
+
+    display = PrecisionRecallDisplay(
+        recall=recall["micro"],
+        precision=precision["micro"],
+        average_precision=average_precision["micro"],
+    )
+    display.plot(ax=ax, name="Micro-average precision-recall", color="gold")
+
+    for i, color in zip(range(n_classes), colors):
+        display = PrecisionRecallDisplay(
+            recall=recall[i],
+            precision=precision[i],
+            average_precision=average_precision[i],
+        )
+        display.plot(ax=ax, name=target_names[i], color=color)
+
+    # Add the legend for the iso-f1 curves
+    handles, labels = display.ax_.get_legend_handles_labels()
+    handles.extend([l])
+    labels.extend(["iso-f1 curves"])
+
+    # Set the legend and the axes
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.legend(handles=handles, labels=labels, loc="best")
+    ax.set_title("Extension of Precision-Recall curve to multi-class")
+
+    plt.show()
