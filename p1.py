@@ -26,7 +26,7 @@ target_names = df.loc[:, 'Class'].unique()
 # df = remove_outliers(df)
 
 # Check missing values
-# check_missing_values(df)
+check_and_delete_missing_values(df)
 
 # Check and delete duplicated rows
 df = check_and_delete_duplicated_rows(df)
@@ -57,21 +57,21 @@ x_train, y_train, columns, std = feature_selection(x_train, y_train, None, None)
 
 model2a = LogisticRegression(penalty="none", class_weight=None, max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
 model2a.fit(x_train, y_train)
-# evaluate_model(model2a, x_train, y_train, target_names)
+evaluate_model(model2a, x_train, y_train, target_names)
 
 # (2-c)
 
 model2c = LogisticRegression(penalty="none", class_weight='balanced', max_iter=THE_LIMITED_NUMBER_OF_EPOCHS, tol=STOP_TIMES)
 model2c.fit(x_train, y_train)
-# evaluate_model(model2c, x_train, y_train, target_names)
+evaluate_model(model2c, x_train, y_train, target_names)
 
 # Part3: Evaluation
 
 # (3-a, 3-b, 3-c)
 
 x_test, y_test, columns, std = feature_selection(x_test, y_test, columns, std)
-# evaluate_model(model2a, x_test, y_test, target_names)
-# evaluate_model(model2c, x_test, y_test, target_names)
+evaluate_model(model2a, x_test, y_test, target_names)
+evaluate_model(model2c, x_test, y_test, target_names)
 
 # Part4: Advanced Tasks
 
@@ -95,7 +95,9 @@ x_test_pf, std_pf = standardization(x_test_pf, std_pf)
 
 # (4-c)
 # Evalulate regularised and unregularised expansion models
-# model4a.fit(x_train_pf, y_train)
-# model4c.fit(x_train_pf, y_train)
-# evaluate_model(model4a, x_test_pf, y_test, target_names)
-# evaluate_model(model4c, x_test_pf, y_test, target_names)
+model4a.fit(x_train_pf, y_train)
+model4c.fit(x_train_pf, y_train)
+evaluate_model(model4a, x_test_pf, y_test, target_names)
+evaluate_model(model4c, x_test_pf, y_test, target_names)
+
+# (4-d)
