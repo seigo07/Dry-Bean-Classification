@@ -1,14 +1,24 @@
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, precision_score, recall_score, \
-    classification_report, ConfusionMatrixDisplay
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from itertools import cycle
+
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 sns.set()
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, precision_score, recall_score, \
+    classification_report, ConfusionMatrixDisplay, precision_recall_curve, average_precision_score, \
+    PrecisionRecallDisplay
+from sklearn.preprocessing import StandardScaler
 
 # This file includes codes which were used in the process and comment out
 # or not used in the end to show the process for this assignment.
 
-# Function for remove outliers
+CORRELATION_MIN = 0.3
+CORRELATION_MAX = 0.9
+
+
+# Function for remove outliers (unused)
 def remove_outliers(df):
     for col in df.columns:
         # Exclude categorical variables
@@ -26,14 +36,6 @@ def remove_outliers(df):
         df[col] = new_df[col]
     return df
 
-
-# Function for plotting correlation between features
-def plot_correlation(df):
-    corr = df.corr()
-    plt.figure(figsize=(16, 16))
-    sns.heatmap(corr, annot=True, square=True)
-    plt.tight_layout()
-    plt.show()
 
 # Function for checking and deleting missing values
 def check_and_delete_missing_values(df):
@@ -64,68 +66,121 @@ def check_and_delete_duplicated_rows(df):
         return df.drop_duplicates()
 
 
+# Function for feature selection
+def feature_selection(x, y, columns, std):
+    selected_features, columns = select_features(x, y, columns)
+    df, std = standardization(selected_features, std)
+    return df, y, columns, std
+
+
+# Function for select features
+def select_features(x, y, columns):
+    # In the case of train
+    if columns is None:
+        # Get select features
+        selected_features = get_features(x, y, y.name)
+        columns = list(selected_features.columns)
+    # In the case of test
+    else:
+        # Get select features from stored select_features
+        selected_features = x[x.columns.intersection(columns)]
+    return selected_features, columns
+
+
 # Function for scaling (standardization)
-def standardization(x_train, x_test):
-    scaler = StandardScaler()
-    # fit on the training dataset
-    scaler.fit(x_train)
-    # scale the training dataset
-    x_train = scaler.transform(x_train)
-    # scale the test dataset
-    x_test = scaler.transform(x_test)
-    return x_train, x_test
+def standardization(x, std):
+    # In the case of train
+    if std is None:
+        std = StandardScaler().fit(x)
+    # scale the input dataset
+    df = pd.DataFrame(std.transform(x), columns=x.columns)
+    return df, std
 
 
-# Function for scaling (normalization)
-# def normalization(x_train, x_test):
-#     scaler = MinMaxScaler()
-#     # fit on the training dataset
-#     scaler.fit(x_train)
-#     # scale the training dataset
-#     x_train = scaler.transform(x_train)
-#     # scale the test dataset
-#     x_test = scaler.transform(x_test)
-#     return x_train, x_test
+# Function for get possible features
+def get_features(x, y, target_names):
+    # Check correlation between features and remove them whose correlation is weak to the output.
+    correlations, df = select_features_based_on_min(x, y)
+    # Check correlation between features and remove them whose correlation is strong for linear independence.
+    df = select_features_based_on_max(df, correlations, target_names)
+    return df
+
+
+# Function for select features based on CORRELATION_MIN
+def select_features_based_on_min(x, y):
+    # Calculate the correlation plot of the data set.
+    df = pd.concat([x, y], axis=1)
+    correlations = pd.concat([x, y], axis=1).corr()
+    # Get correlations with y.
+    target = abs(correlations[y.name])
+    # Pick up features which are correlated strongly based on CORRELATION_MIN.
+    features = target[target >= CORRELATION_MIN]
+    # Get a dataFrame of features.
+    df = df.loc[:, features.index.values.tolist()]
+    df.drop(y.name, axis=1, inplace=True)
+    return correlations, df
+
+
+# Function for select features based on CORRELATION_MAX
+def select_features_based_on_max(df, correlations, target_names):
+    # Remove linearly dependant features.
+    feature_corr = abs(df.corr())
+    for i in range(feature_corr.shape[0]):
+        for j in range(i + 1, feature_corr.shape[0]):
+            # Remove the feature whose correlation is weakest with the output
+            # in case of having strong correlation with each other
+            if feature_corr.iloc[i, j] >= CORRELATION_MAX:
+                feature_col_1 = feature_corr.columns[i]
+                y_corr_1 = correlations[feature_col_1][target_names]
+                feature_col_2 = feature_corr.columns[j]
+                y_corr_2 = correlations[feature_col_2][target_names]
+                # Drop the lesser correlated feature with the output.
+                if y_corr_1 > y_corr_2:
+                    if feature_col_2 in df.columns:
+                        df.drop(feature_col_2, axis=1, inplace=True)
+                else:
+                    if feature_col_1 in df.columns:
+                        df.drop(feature_col_1, axis=1, inplace=True)
+                    break
+    return df
 
 
 # Function for output solutions
-def evaluate_model(model, x_train, y_train, x_test, y_test, target_names):
-
-    model.fit(x_train, y_train)
-    pred = model.predict(x_test)
+def evaluate_model(model, x, y, target_names):
+    pred = model.predict(x)
 
     # (2-d)
     print('pred = ', pred)
-    print('decision_function = ', model.decision_function(x_test))
-    print('predict_proba = ', model.predict_proba(x_test))
+    print('decision_function = ', model.decision_function(x))
+    print('predict_proba = ', model.predict_proba(x))
 
     # (3-a)
-    print('classification accuracy = ', accuracy_score(y_test, pred))
+    print('classification accuracy = ', accuracy_score(y, pred))
     # (3-b)
-    print('balanced accuracy = ', balanced_accuracy_score(y_test, pred))
+    print('balanced accuracy = ', balanced_accuracy_score(y, pred))
     # (3-c)
-    print('confusion matrix = \n', confusion_matrix(y_test, pred))
+    print('confusion matrix = \n', confusion_matrix(y, pred))
     # (3-d)
-    print('precision micro = ', precision_score(y_test, pred, average='micro'))
-    print('precision macro = ', precision_score(y_test, pred, average='macro'))
-    print('recall micro = ', recall_score(y_test, pred, average='micro'))
-    print('recall macro = ', recall_score(y_test, pred, average='macro'))
-    print('classification report: \n', classification_report(y_test, pred))
+    print('precision micro = ', precision_score(y, pred, average='micro'))
+    print('precision macro = ', precision_score(y, pred, average='macro'))
+    print('recall micro = ', recall_score(y, pred, average='micro'))
+    print('recall macro = ', recall_score(y, pred, average='macro'))
+    print('classification report: \n', classification_report(y, pred))
 
     # (3-a)
     # sum of diagonal elements of confusion matrix / sum of all elements of the confusion matrix
-    c = confusion_matrix(y_test, pred)
+    c = confusion_matrix(y, pred)
     accuracy = c.trace() / c.sum()
-    # print('classification accuracy = ', accuracy)
+    # print('classification accuracy by confusion_matrix = ', accuracy)
 
     # (3-b)
     # sum of recall_score / size of recall_score
-    r = recall_score(y_test, pred, average=None)
+    r = recall_score(y, pred, average=None)
     accuracy = r.sum() / r.size
-    # print('balanced accuracy = ', accuracy)
+    # print('balanced accuracy by recall_score = ', accuracy)
     print("\n")
 
-    # plot_matrix(target_names, pred, y_test)
+    plot_matrix(target_names, pred, y)
 
 
 # Function for plot confusion matrix
@@ -133,4 +188,64 @@ def plot_matrix(target_names, y_pred, y_test):
     cm = confusion_matrix(y_pred, y_test)
     cmp = ConfusionMatrixDisplay(cm, display_labels=target_names)
     cmp.plot(cmap=plt.cm.Blues)
+    plt.show()
+
+
+# Function for each class
+def setup_precision_recall_average_precision(n_classes, y_test, y_score):
+    precision = dict()
+    recall = dict()
+    average_precision = dict()
+    for i in range(n_classes):
+        precision[i], recall[i], _ = precision_recall_curve(y_test[:, i], y_score[:, i])
+        average_precision[i] = average_precision_score(y_test[:, i], y_score[:, i])
+
+    # A "micro-average": quantifying score on all classes jointly
+    precision["micro"], recall["micro"], _ = precision_recall_curve(
+        y_test.ravel(), y_score.ravel()
+    )
+    average_precision["micro"] = average_precision_score(y_test, y_score, average="micro")
+    return precision, recall, average_precision
+
+
+# Function for plot Precision-Recall
+def plot_precision_recall(precision, recall, average_precision, n_classes, target_names):
+    colors = cycle(["navy", "turquoise", "darkorange", "cornflowerblue", "teal"])
+
+    _, ax = plt.subplots(figsize=(7, 8))
+
+    f_scores = np.linspace(0.2, 0.8, num=4)
+    lines, labels = [], []
+    for f_score in f_scores:
+        x = np.linspace(0.01, 1)
+        y = f_score * x / (2 * x - f_score)
+        (l,) = plt.plot(x[y >= 0], y[y >= 0], color="gray", alpha=0.2)
+        plt.annotate("f1={0:0.1f}".format(f_score), xy=(0.9, y[45] + 0.02))
+
+    display = PrecisionRecallDisplay(
+        recall=recall["micro"],
+        precision=precision["micro"],
+        average_precision=average_precision["micro"],
+    )
+    display.plot(ax=ax, name="Micro-average precision-recall", color="gold")
+
+    for i, color in zip(range(n_classes), colors):
+        display = PrecisionRecallDisplay(
+            recall=recall[i],
+            precision=precision[i],
+            average_precision=average_precision[i],
+        )
+        display.plot(ax=ax, name=target_names[i], color=color)
+
+    # Add the legend for the iso-f1 curves
+    handles, labels = display.ax_.get_legend_handles_labels()
+    handles.extend([l])
+    labels.extend(["iso-f1 curves"])
+
+    # Set the legend and the axes
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.legend(handles=handles, labels=labels, loc="best")
+    ax.set_title("Extension of Precision-Recall curve to multi-class")
+
     plt.show()
