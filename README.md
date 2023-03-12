@@ -4,15 +4,7 @@ Dry Bean Classification
 
 ## Description
 
-Classification by logistic regression.
-
-## Process
-
-Estimating the transition probabilities and the emission probabilities of an HMM by Witten-Bell smoothing (Hidden Markov Model).
-
-Applying UNK tags to unknown words in English, French, and Ukrainian to improve accuracy.
-
-Using the Viterbi algorithm for testing.
+This is a classification sample application by logistic regression.
 
 ## Getting Started
 
@@ -25,5 +17,6 @@ Using the Viterbi algorithm for testing.
 * Please run the following command
 * Usege en, fr, or uk as <lang>
 ```
+cd Dry-Bean-Classification
 python p1.py
 ```
