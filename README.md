@@ -1,10 +1,12 @@
 # Project
 
-Dry Bean Classification
+Dry Bean Classification.
 
 ## Description
 
 This is a classification sample application by logistic regression.
+
+Using drybeans dataset which contains various measurements taken from 13,611 instances of 7 different types of dry beans for this analysis.
 
 <img width="576" alt="Screenshot 2023-03-12 at 02 23 25" src="https://user-images.githubusercontent.com/118636537/224520673-441798f3-d8d8-4138-a405-cba22370ad48.png">
 
