@@ -23,7 +23,6 @@ Using drybeans dataset which contains various measurements taken from 13,611 ins
 ### Executing program
 
 * Please run the following command
-* Usege en, fr, or uk as <lang>
 ```
 cd Dry-Bean-Classification
 python p1.py
